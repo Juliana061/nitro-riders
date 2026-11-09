@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NITRO RIDERS — Regístrate y acelera</title>
+<title>NITRO RIDERS MOTOR CLUB — Regístrate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&family=Metal+Mania&family=New+Rocker&display=swap" rel="stylesheet">
 <style>
 :root{--negro:#07070A;--fuego:#FF4D00;--amarillo:#FFC300;--rojo:#E10600;--blanco:#F5F5F5;
   --grad:linear-gradient(90deg,#E10600,#FF4D00,#FFC300)}
@@ -15,6 +15,17 @@ html{scroll-behavior:smooth}
 body{background:var(--negro);color:var(--blanco);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
 body.lock{overflow:hidden}
 .anton{font-family:Anton,Impact,sans-serif;letter-spacing:1px;text-transform:uppercase}
+.metal{font-family:"Metal Mania",Anton,Impact,serif;text-transform:none;letter-spacing:2px}
+.rocker{font-family:"New Rocker",serif;letter-spacing:6px}
+.firetxt{background:linear-gradient(180deg,#fff6c8 0%,#FFC300 30%,#FF4D00 62%,#9e0000 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(255,77,0,.7)) drop-shadow(0 3px 0 #2a0000)}
+/* textura grunge */
+body::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.12;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#bolt{position:fixed;inset:0;z-index:45;pointer-events:none}
+.logo-metal{font-size:clamp(2.6rem,7vw,5.2rem);line-height:1;opacity:0}
+.club{display:block;font-size:clamp(.8rem,1.6vw,1.05rem);color:#ddd;margin:6px 0 4px;opacity:0}
+.club::before,.club::after{content:"";display:inline-block;width:46px;height:2px;vertical-align:middle;margin:0 12px;background:linear-gradient(90deg,transparent,#FF4D00)}
+.club::after{background:linear-gradient(90deg,#FF4D00,transparent)}
 
 /* ================= INTRO ================= */
 #intro{position:fixed;inset:0;z-index:1000;display:grid;place-items:center}
@@ -66,7 +77,7 @@ body.lock{overflow:hidden}
 /* Texto */
 .head{position:absolute;top:7%;left:0;right:0;text-align:center;z-index:5;padding:0 16px}
 .brand{font-size:1rem;letter-spacing:10px;color:var(--fuego);opacity:0}
-.title{font-size:clamp(3rem,11vw,9rem);line-height:.9;margin:8px 0 6px;display:flex;justify-content:center;flex-wrap:wrap;gap:0 .25em}
+.title{font-size:clamp(3rem,10vw,8rem);line-height:.9;margin:8px 0 6px;display:flex;justify-content:center;flex-wrap:wrap;gap:0 .25em}
 .title .w{display:inline-flex}
 .title .l{display:inline-block;opacity:0;transform:translateY(-120px) scale(2) rotate(-12deg)}
 .title .l.in{animation:slam .45s cubic-bezier(.2,1.8,.4,1) forwards}
@@ -110,7 +121,7 @@ body.lock{overflow:hidden}
 #win{position:absolute;inset:0;z-index:8;display:grid;place-items:center;text-align:center;pointer-events:none;opacity:0;padding:20px}
 #win.show{opacity:1;pointer-events:auto}
 #win h2{font-size:clamp(3.5rem,13vw,10rem);line-height:.9;transform:scale(4);opacity:0}
-#win.show h2{animation:winIn .6s cubic-bezier(.2,1.6,.4,1) forwards,fireText 1.5s linear infinite}
+#win.show h2{animation:winIn .6s cubic-bezier(.2,1.6,.4,1) forwards}
 @keyframes winIn{to{transform:none;opacity:1}}
 #win p{font-size:1.2rem;margin:16px 0 22px;color:#eee;opacity:0;transition:opacity .5s .6s}
 #win.show p{opacity:1}
@@ -185,6 +196,7 @@ footer{text-align:center;padding:40px;color:#666;font-size:.85rem}
   </div>
 </div>
 <div id="flash"></div>
+<canvas id="bolt"></canvas>
 <canvas id="fx"></canvas>
 
 <!-- ========== HERO ========== -->
@@ -195,9 +207,9 @@ footer{text-align:center;padding:40px;color:#666;font-size:.85rem}
   <div class="speedlines" id="speedlines"></div>
 
   <div class="head" id="head">
-    <div class="brand anton" id="brand">NITRO RIDERS CLUB</div>
+    <div class="metal firetxt logo-metal" id="brand">Nitro Riders</div><span class="rocker club" id="clubtag">MOTOR CLUB</span>
     <h1 class="title anton glitch" id="title" aria-label="Regístrate aquí"></h1>
-    <p class="sub" id="sub">Únete al club, recibe la invitación a la rodada de lanzamiento y acelera sin límites.</p>
+    <p class="sub" id="sub">Únete a la manada. Recibe tu invitación a la rodada de lanzamiento y siente arder el asfalto.</p>
     <form class="form" id="form" novalidate>
       <input type="email" id="email" name="EMAIL" placeholder="TU CORREO AQUÍ" autocomplete="email" required>
       <input class="hp" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off">
@@ -265,8 +277,8 @@ footer{text-align:center;padding:40px;color:#666;font-size:.85rem}
 
   <div id="win">
     <div>
-      <h2 class="anton hot" style="background:var(--grad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent">ESTÁS DENTRO</h2>
-      <p>Te acabamos de enviar tu invitación al correo. Revisa tu bandeja (y Promociones, por si acaso).</p>
+      <h2 class="metal firetxt">Estás dentro</h2>
+      <p>Bienvenido a la manada. Te acabamos de enviar tu invitación al correo. Revisa tu bandeja (y Promociones, por si acaso).</p>
       <button class="btn" onclick="resetHero()">OTRA VUELTA</button>
     </div>
   </div>
@@ -275,21 +287,21 @@ footer{text-align:center;padding:40px;color:#666;font-size:.85rem}
 
 <!-- ========== SECCIONES ========== -->
 <div class="marquee anton"><div class="track">
-  <span>ACELERA</span><span>SIN LÍMITES</span><span>ÚNETE AL CLUB</span><span>RODADAS ÉPICAS</span><span>NITRO RIDERS</span>
-  <span>ACELERA</span><span>SIN LÍMITES</span><span>ÚNETE AL CLUB</span><span>RODADAS ÉPICAS</span><span>NITRO RIDERS</span>
+  <span>RUGE EL MOTOR</span><span>SIN LÍMITES</span><span>ÚNETE A LA MANADA</span><span>RODADAS NOCTURNAS</span><span>NITRO RIDERS</span>
+  <span>RUGE EL MOTOR</span><span>SIN LÍMITES</span><span>ÚNETE A LA MANADA</span><span>RODADAS NOCTURNAS</span><span>NITRO RIDERS</span>
 </div></div>
 <div class="marquee rev anton"><div class="track">
-  <span>FUEGO EN EL ASFALTO</span><span>REGÍSTRATE HOY</span><span>VUÉLVETE LEYENDA</span>
-  <span>FUEGO EN EL ASFALTO</span><span>REGÍSTRATE HOY</span><span>VUÉLVETE LEYENDA</span>
+  <span>ARDE EL ASFALTO</span><span>REGÍSTRATE HOY</span><span>VUÉLVETE LEYENDA</span>
+  <span>ARDE EL ASFALTO</span><span>REGÍSTRATE HOY</span><span>VUÉLVETE LEYENDA</span>
 </div></div>
 
 <section>
-  <h2 class="sec-title anton reveal">QUÉ GANAS AL <span style="color:var(--fuego)">UNIRTE</span></h2>
+  <h2 class="sec-title anton reveal">QUÉ GANAS AL <span class="metal firetxt" style="font-size:1.15em">unirte</span></h2>
   <p class="sec-sub reveal">Todo llega directo a tu correo. Sin rodeos.</p>
   <div class="cards">
     <div class="card reveal"><div class="n anton">01</div><h3 class="anton">Rodada de lanzamiento</h3><p>Invitación exclusiva a la primera rodada del club, con ruta, hora y punto de encuentro.</p></div>
-    <div class="card reveal"><div class="n anton">02</div><h3 class="anton">Descuentos</h3><p>Beneficios en cascos, guantes y accesorios solo para miembros registrados.</p></div>
-    <div class="card reveal"><div class="n anton">03</div><h3 class="anton">Comunidad</h3><p>Conoce riders de tu ciudad, comparte rutas y entérate primero de cada evento.</p></div>
+    <div class="card reveal"><div class="n anton">02</div><h3 class="anton">20% en equipo</h3><p>Cascos, guantes y chaquetas de cuero con tu código de miembro.</p></div>
+    <div class="card reveal"><div class="n anton">03</div><h3 class="anton">La manada</h3><p>Riders de tu ciudad, rutas nocturnas y eventos antes que nadie.</p></div>
   </div>
 </section>
 
@@ -303,12 +315,12 @@ footer{text-align:center;padding:40px;color:#666;font-size:.85rem}
 
 <section>
   <div class="final reveal" id="final">
-    <h2 class="anton">¿LISTO PARA <span style="color:var(--amarillo)">RODAR</span>?</h2>
+    <h2 class="anton">¿LISTO PARA <span class="metal firetxt" style="font-size:1.15em">rodar</span>?</h2>
     <p>El motor ya está encendido. Solo falta tu correo.</p>
     <a href="#hero" class="btn" style="display:inline-block;text-decoration:none">REGISTRARME</a>
   </div>
 </section>
-<footer>NITRO RIDERS CLUB · 2026 · Proyecto académico de email marketing</footer>
+<footer><span class="metal" style="font-size:1.4rem;color:#FF4D00">Ruge el motor. Arde el asfalto.</span><br>NITRO RIDERS MOTOR CLUB · 2026 · Proyecto académico de email marketing</footer>
 
 <script>
 /* =====================================================
@@ -332,7 +344,10 @@ function emit(x,y,type,n=1,power=1){for(let i=0;i<n;i++){
 function pt(id){const e=document.getElementById(id),m=e.getScreenCTM();const p=$("#motoSvg").createSVGPoint();p.x=+e.getAttribute("cx");p.y=+e.getAttribute("cy");return p.matrixTransform(m)}
 (function loop(){cx.clearRect(0,0,cv.width,cv.height);
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;
-    if(p.t==="fire"){p.life-=.035;p.s*=.97;p.vy-=.08;cx.globalCompositeOperation="lighter";
+    if(p.t==="ember"){p.life-=.006;cx.globalCompositeOperation="lighter";p.x+=Math.sin(p.y/40)*.4;
+      const a=Math.min(p.life,1);const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*2);g.addColorStop(0,`rgba(255,210,120,${a})`);g.addColorStop(1,"rgba(255,60,0,0)");
+      cx.fillStyle=g;cx.beginPath();cx.arc(p.x,p.y,p.s*2,0,7);cx.fill()}
+    else if(p.t==="fire"){p.life-=.035;p.s*=.97;p.vy-=.08;cx.globalCompositeOperation="lighter";
       const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s);const a=Math.max(p.life,0);
       g.addColorStop(0,`rgba(255,240,180,${a})`);g.addColorStop(.35,`rgba(255,150,0,${a*.85})`);g.addColorStop(1,"rgba(225,6,0,0)");
       cx.fillStyle=g;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
@@ -408,6 +423,18 @@ function engineSound(){try{const A=new (window.AudioContext||window.webkitAudioC
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.1);g.gain.setValueAtTime(.25,t+1.9);g.gain.exponentialRampToValueAtTime(.001,t+2.8);
   o.connect(f);o2.connect(f);f.connect(g);g.connect(A.destination);o.start();o2.start();o.stop(t+2.9);o2.stop(t+2.9)}catch(e){}}
 
+/* ---------- Rayos ---------- */
+const bc=$("#bolt"),bx=bc.getContext("2d");
+function lightning(){bc.width=innerWidth;bc.height=innerHeight;
+  const pts=[[Math.random()*innerWidth,0]];while(pts.at(-1)[1]<innerHeight*.75){const [x,y]=pts.at(-1);pts.push([x+(Math.random()-.5)*90,y+Math.random()*50+20])}
+  const draw=(w,c)=>{bx.strokeStyle=c;bx.lineWidth=w;bx.beginPath();pts.forEach(([x,y],i)=>i?bx.lineTo(x,y):bx.moveTo(x,y));bx.stroke()};
+  bx.shadowColor="#ffb070";bx.shadowBlur=30;draw(6,"rgba(255,120,40,.5)");draw(2,"#fff");
+  $("#flash").animate([{opacity:.35},{opacity:0},{opacity:.2},{opacity:0}],{duration:420});
+  setTimeout(()=>bx.clearRect(0,0,bc.width,bc.height),160)}
+setInterval(()=>{if(Math.random()<.5)lightning()},5200);
+/* brasas que suben todo el tiempo */
+setInterval(()=>{for(let i=0;i<1;i++)parts.push({t:"ember",x:Math.random()*innerWidth,y:innerHeight+10,vx:(Math.random()-.5)*.8,vy:-(Math.random()*1.6+.8),life:1.6,s:Math.random()*3+2})},60);
+
 /* ---------- Al registrarse: FUEGO ---------- */
 async function blastOff(){
   tricksOn=false;engineSound();body.classList.remove("idle");
@@ -469,7 +496,9 @@ $("#final").addEventListener("mousemove",e=>emit(e.clientX,e.clientY,"burn",2));
   setTimeout(()=>$("#intro").remove(),1000);
   await sleep(300);
   await enter();
-  $("#brand").animate([{opacity:0,letterSpacing:"40px"},{opacity:1,letterSpacing:"10px"}],{duration:600,fill:"forwards"});
+  $("#brand").animate([{opacity:0,transform:"scale(2.4)",filter:"blur(8px)"},{opacity:1,transform:"scale(1)",filter:"drop-shadow(0 0 14px rgba(255,77,0,.7))"}],{duration:500,easing:"cubic-bezier(.2,1.6,.4,1)",fill:"forwards"});
+  lightning();shake();await sleep(250);
+  $("#clubtag").animate([{opacity:0,letterSpacing:"30px"},{opacity:1,letterSpacing:"6px"}],{duration:600,fill:"forwards"});
   const ls=document.querySelectorAll(".title .l");
   for(const [i,l] of ls.entries()){l.classList.add("in");if(i%3===0)shake();await sleep(70)}
   await sleep(200);$("#sub").classList.add("in");await sleep(250);$("#form").classList.add("in");
