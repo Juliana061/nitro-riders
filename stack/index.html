@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACK CLUB — El club de los que programan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1116;--panel:#151A22;--line:#26303D;--cian:#38BDF8;--rosa:#FB7185;--lima:#34D399;--amarillo:#FBBF24;--morado:#6366F1;--texto:#E2E8F0;--gris:#94A3B8;
+  --grad:linear-gradient(90deg,#34D399,#38BDF8,#FB7185)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--texto);font-family:"Space Grotesk",system-ui,sans-serif;overflow-x:hidden}
+body.lock{overflow:hidden}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+canvas.fixed{position:fixed;inset:0;pointer-events:none}
+#rain{z-index:0;opacity:.35}#fx{z-index:50}
+
+/* ===== BOOT ===== */
+#boot{position:fixed;inset:0;z-index:1000;background:#07090C;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .6s,transform .6s}
+#boot.off{opacity:0;transform:scale(1.4);pointer-events:none}
+.term{width:min(680px,100%);background:#0B0E13;border:1px solid var(--line);border-radius:12px;box-shadow:0 0 0 1px rgba(56,189,248,.15),0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(99,102,241,.25);overflow:hidden}
+.bar{display:flex;gap:8px;padding:12px 14px;background:#121720;border-bottom:1px solid var(--line);align-items:center}
+.bar i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.bar i:nth-child(1){background:#F87171}.bar i:nth-child(2){background:#FBBF24}.bar i:nth-child(3){background:#4ADE80}
+.bar span{margin-left:10px;color:var(--gris);font-size:.8rem}
+#bootlog{padding:20px;min-height:260px;font-size:clamp(.78rem,2.2vw,.95rem);line-height:1.7;white-space:pre-wrap}
+.ok{color:var(--lima)}.c{color:var(--cian)}.p{color:var(--rosa)}.y{color:var(--amarillo)}.g{color:var(--gris)}.m{color:var(--morado)}
+.press{display:inline-block;margin-top:8px;color:var(--amarillo);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.cur{display:inline-block;width:.6em;height:1.1em;background:var(--cian);vertical-align:text-bottom;animation:blink 1s steps(2) infinite}
+
+/* ===== HERO ===== */
+.hero{position:relative;min-height:100vh;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding:40px 6vw;z-index:1}
+.floor{position:absolute;left:-50%;right:-50%;bottom:-10%;height:45%;transform:perspective(400px) rotateX(62deg);transform-origin:50% 100%;
+  background-image:linear-gradient(rgba(99,102,241,.55) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.45) 1px,transparent 1px);background-size:60px 60px;animation:floor 1.6s linear infinite;
+  mask-image:linear-gradient(transparent,black 40%);-webkit-mask-image:linear-gradient(transparent,black 40%);pointer-events:none}
+@keyframes floor{to{background-position:0 60px}}
+.glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none;animation:float 14s ease-in-out infinite}
+.glow.a{width:420px;height:420px;background:var(--morado);top:-120px;left:-100px}
+.glow.b{width:380px;height:380px;background:var(--rosa);bottom:0;right:-80px;animation-delay:-5s;opacity:.25}
+.glow.c{width:300px;height:300px;background:var(--cian);top:30%;left:45%;animation-delay:-9s;opacity:.2}
+@keyframes float{50%{transform:translate(60px,-40px) scale(1.1)}}
+.glyph{position:absolute;font-family:"JetBrains Mono";font-weight:800;pointer-events:none;opacity:.5;animation:drift linear infinite}
+#glyphs{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+@keyframes drift{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+
+.left{position:relative;z-index:3}
+.tag{display:inline-flex;gap:8px;align-items:center;padding:7px 14px;border-radius:999px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.08);color:var(--lima);font-size:.85rem;margin-bottom:18px}
+.tag b{width:8px;height:8px;border-radius:50%;background:var(--lima);box-shadow:0 0 10px var(--lima);animation:blink 1.2s infinite}
+h1.logo{font-family:"JetBrains Mono";font-weight:800;font-size:clamp(3.2rem,9vw,7.2rem);line-height:.9;letter-spacing:-2px;position:relative}
+h1.logo .br{color:var(--cian)}
+h1.logo .t{background:var(--grad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gradmove 4s linear infinite}
+@keyframes gradmove{to{background-position:200% center}}
+.rgb{animation:rgb 4s infinite}
+@keyframes rgb{0%,90%,100%{text-shadow:none}92%{text-shadow:-4px 0 var(--rosa),4px 0 var(--cian)}94%{text-shadow:4px 0 var(--lima),-4px 0 var(--rosa)}}
+.lead{margin:18px 0 26px;font-size:clamp(1.05rem,2vw,1.25rem);color:var(--gris);max-width:520px;line-height:1.55}
+.lead b{color:var(--texto)}
+.typed{color:var(--rosa);font-family:"JetBrains Mono"}
+
+/* formulario estilo terminal */
+.form{max-width:560px;background:#0B0E13;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.form::before{content:"";position:absolute;inset:-2px;border-radius:16px;padding:2px;background:var(--grad);background-size:300% 300%;animation:gradmove 3s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.prompt{display:flex;align-items:center;gap:10px;padding:18px 16px;font-family:"JetBrains Mono";font-size:1rem}
+.prompt .ps{color:var(--lima);white-space:nowrap}
+.prompt input{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--cian);font:inherit;caret-color:var(--rosa)}
+.prompt input::placeholder{color:#475569}
+.actions{display:flex;gap:10px;padding:0 12px 12px}
+.btn{flex:1;border:0;border-radius:10px;padding:15px 18px;background:var(--grad);background-size:200% auto;color:#0E1116;font:800 1rem "JetBrains Mono";cursor:pointer;transition:transform .15s,box-shadow .2s;position:relative;overflow:hidden;text-decoration:none;display:inline-block;text-align:center}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(251,113,133,.45);background-position:100% 0}
+.btn::after{content:"";position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-25deg);animation:shine 2.2s infinite}
+@keyframes shine{to{left:180%}}
+.hp{position:absolute;left:-9999px}
+#out{font-family:"JetBrains Mono";font-size:.85rem;padding:0 16px 14px;min-height:1.4em;line-height:1.6}
+.hint{font-size:.8rem;color:#64748B;margin-top:10px;font-family:"JetBrains Mono"}
+.sound{position:fixed;top:16px;right:16px;z-index:60;background:#151A22;border:1px solid var(--line);color:var(--texto);border-radius:999px;padding:8px 14px;font:700 .8rem "JetBrains Mono";cursor:pointer}
+
+/* editor animado */
+.right{position:relative;z-index:2}
+.editor{background:#0B0E13;border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 60px rgba(56,189,248,.18);overflow:hidden;transform:perspective(900px) rotateY(-10deg) rotateX(4deg);animation:hover 6s ease-in-out infinite}
+@keyframes hover{50%{transform:perspective(900px) rotateY(-4deg) rotateX(1deg) translateY(-12px)}}
+#code{padding:18px 18px 22px;font:500 clamp(.78rem,1.4vw,.95rem)/1.75 "JetBrains Mono";min-height:300px;white-space:pre}
+.ln{color:#3A4656;display:inline-block;width:2.2em}
+.k{color:var(--rosa)}.s{color:var(--lima)}.f{color:var(--cian)}.n{color:var(--amarillo)}.cm{color:#5E6B7D;font-style:italic}.v{color:#A5F3FC}
+.chip{position:absolute;padding:9px 14px;border-radius:12px;background:rgba(18,21,42,.9);border:1px solid var(--line);font:700 .85rem "JetBrains Mono";box-shadow:0 10px 30px rgba(0,0,0,.4);animation:bob 4s ease-in-out infinite}
+.chip.c1{top:-18px;right:6%;color:var(--lima)}.chip.c2{bottom:-16px;left:4%;color:var(--rosa);animation-delay:-2s}.chip.c3{top:42%;right:-10px;color:var(--amarillo);animation-delay:-1s}
+@keyframes bob{50%{transform:translateY(-12px)}}
+
+/* éxito */
+#win{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(5,6,13,.82);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:.4s;padding:20px}
+#win.show{opacity:1;pointer-events:auto}
+#win .box{text-align:center;transform:scale(.6);transition:.6s cubic-bezier(.2,1.6,.4,1)}
+#win.show .box{transform:scale(1)}
+#win h2{font:800 clamp(2.6rem,9vw,6rem)/1 "JetBrains Mono";background:var(--grad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gradmove 2s linear infinite}
+#win .st{font:700 1rem "JetBrains Mono";color:var(--lima);margin-bottom:12px}
+#win p{color:var(--gris);margin:14px 0 24px;font-size:1.1rem}
+
+/* secciones */
+section{position:relative;z-index:2;padding:90px 6vw;max-width:1250px;margin:auto}
+.st-title{font:800 clamp(2.2rem,5vw,3.8rem)/1.05 "JetBrains Mono";text-align:center}
+.st-title span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.st-sub{text-align:center;color:var(--gris);margin:12px auto 50px;max-width:560px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.card{position:relative;padding:30px;border-radius:16px;background:var(--panel);border:1px solid var(--line);overflow:hidden;transition:transform .15s,border-color .3s}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(300px circle at var(--x,50%) var(--y,50%),rgba(99,102,241,.25),transparent 50%);opacity:0;transition:.3s}
+.card:hover::before{opacity:1}
+.card .ic{font:800 1.6rem "JetBrains Mono";margin-bottom:16px;width:58px;height:58px;display:grid;place-items:center;border-radius:14px;background:#0B0E13;border:1px solid var(--line)}
+.card h3{font-size:1.4rem;margin-bottom:8px}.card p{color:var(--gris);line-height:1.6;position:relative}
+.marquee{overflow:hidden;border-block:1px solid var(--line);background:#11161D;padding:16px 0;position:relative;z-index:2}
+.track{display:flex;width:max-content;gap:50px;animation:mq 22s linear infinite;font:700 1.3rem "JetBrains Mono"}
+.track span:nth-child(4n+1){color:var(--cian)}.track span:nth-child(4n+2){color:var(--rosa)}.track span:nth-child(4n+3){color:var(--lima)}.track span:nth-child(4n){color:var(--amarillo)}
+@keyframes mq{to{transform:translateX(-50%)}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;text-align:center}
+.stat .num{font:800 clamp(3rem,7vw,5rem)/1 "JetBrains Mono"}
+.stat:nth-child(1) .num{color:var(--cian)}.stat:nth-child(2) .num{color:var(--rosa)}.stat:nth-child(3) .num{color:var(--lima)}
+.stat p{color:var(--gris);font-family:"JetBrains Mono";font-size:.85rem;margin-top:6px}
+.final{text-align:center;padding:70px 20px;border-radius:22px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(99,102,241,.18),rgba(251,113,133,.12));border:1px solid var(--line)}
+.final h2{font:800 clamp(2rem,5vw,3.6rem)/1.1 "JetBrains Mono"}
+.final p{color:var(--gris);margin:14px 0 26px}
+footer{text-align:center;padding:40px 20px;color:#64748B;font-family:"JetBrains Mono";font-size:.85rem;position:relative;z-index:2}
+.reveal{opacity:0;transform:translateY(60px)}
+.reveal.show{opacity:1;transform:none;transition:opacity .7s,transform .7s cubic-bezier(.2,1.3,.4,1)}
+
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:70px}.editor{transform:none;animation:none}.chip.c3{display:none}}
+@media(max-width:520px){.actions{flex-direction:column}#code{font-size:.72rem}}
+</style>
+</head>
+<body class="lock">
+
+<canvas id="rain" class="fixed"></canvas>
+<canvas id="fx" class="fixed"></canvas>
+<button class="sound" id="sbtn" type="button">SONIDO: ON</button>
+
+<!-- ===== BOOT ===== -->
+<div id="boot">
+  <div class="term">
+    <div class="bar"><i></i><i></i><i></i><span class="mono">stackclub@terminal: ~</span></div>
+    <div id="bootlog" class="mono"></div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<header class="hero" id="hero">
+  <div class="floor"></div>
+  <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+  <div id="glyphs"></div>
+
+  <div class="left">
+    <div class="tag mono"><b></b> inscripciones abiertas</div>
+    <h1 class="logo rgb"><span class="br">&lt;</span><span class="t">Stack</span><br><span class="t">Club</span><span class="br">/&gt;</span></h1>
+    <p class="lead">El club de los que programan. Regístrate y recibe tu pase a la <b>hackatón de lanzamiento</b>. Aquí se viene a <span class="typed" id="typed"></span></p>
+    <form class="form" id="form" novalidate>
+      <label class="prompt"><span class="ps">~/club $</span>
+        <input type="email" id="email" name="EMAIL" placeholder="escribe.tu@correo.com" autocomplete="email" required spellcheck="false">
+      </label>
+      <input class="hp" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="locale" value="es">
+      <div class="actions"><button class="btn" id="btn" type="submit">git commit -m "me uno"</button></div>
+      <div id="out" class="g">// escribe tu correo y escucha el teclado</div>
+    </form>
+    <div class="hint">Cada tecla suena. Sube el volumen.</div>
+  </div>
+
+  <div class="right">
+    <div class="editor">
+      <div class="bar"><i></i><i></i><i></i><span class="mono">club.js</span></div>
+      <div id="code"></div>
+    </div>
+    <div class="chip c1">build: passing</div>
+    <div class="chip c2">+1 miembro</div>
+    <div class="chip c3">0 bugs (casi)</div>
+  </div>
+</header>
+
+<div class="marquee"><div class="track">
+  <span>console.log("hola, club")</span><span>git push --force-feelings</span><span>while(vivo) programar()</span><span>npm install amigos</span>
+  <span>console.log("hola, club")</span><span>git push --force-feelings</span><span>while(vivo) programar()</span><span>npm install amigos</span>
+</div></div>
+
+<section>
+  <h2 class="st-title reveal">Qué ganas al <span>unirte</span></h2>
+  <p class="st-sub reveal">Todo llega directo a tu correo. Sin spam, sin bugs.</p>
+  <div class="cards">
+    <div class="card reveal"><div class="ic" style="color:var(--cian)">&lt;/&gt;</div><h3>Hackatón de lanzamiento</h3><p>24 horas de código, pizza y retos. Fecha y lugar llegan pronto a tu correo.</p></div>
+    <div class="card reveal"><div class="ic" style="color:var(--rosa)">20%</div><h3>Descuento en cursos</h3><p>JavaScript, React, Node y más, con tu código de miembro.</p></div>
+    <div class="card reveal"><div class="ic" style="color:var(--lima)">{ }</div><h3>La comunidad</h3><p>Programadores de tu ciudad, mentorías y proyectos en equipo.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="stats">
+    <div class="stat reveal"><div class="num" data-count="24" data-suffix="h">0</div><p>// de hackatón</p></div>
+    <div class="stat reveal"><div class="num" data-count="100" data-suffix="%">0</div><p>// open source</p></div>
+    <div class="stat reveal"><div class="num" data-count="1">0</div><p>// clic para unirte</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="final reveal">
+    <h2>¿Listo para hacer <span style="color:var(--lima)">deploy</span>?</h2>
+    <p>Tu teclado ya está listo. Solo falta tu correo.</p>
+    <a href="#hero" class="btn" style="flex:none;padding:15px 30px">./registrarme.sh</a>
+  </div>
+</section>
+<footer>&lt;/&gt; con código y café · STACK CLUB 2026 · Proyecto académico de email marketing</footer>
+
+<div id="win"><div class="box">
+  <div class="st">[OK] BUILD SUCCESSFUL</div>
+  <h2>Estás dentro</h2>
+  <p>Te acabamos de enviar tu pase a la hackatón. Revisa tu correo (y Promociones).</p>
+  <button class="btn" style="flex:none;padding:14px 30px" onclick="closeWin()">cerrar()</button>
+</div></div>
+
+<script>
+const BREVO_FORM_URL = "PEGA_AQUI_TU_URL_DE_BREVO";
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ================= SONIDO (Web Audio, sin archivos) ================= */
+let AC=null,soundOn=true;
+function ac(){if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)()}if(AC.state==="suspended")AC.resume();return AC}
+function noiseBuf(){const a=ac(),b=a.createBuffer(1,a.sampleRate*.05,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);return b}
+let NB=null;
+function keyClick(kind){if(!soundOn)return;const a=ac();NB=NB||noiseBuf();const t=a.currentTime;
+  const s=a.createBufferSource();s.buffer=NB;const f=a.createBiquadFilter();f.type="bandpass";
+  f.frequency.value=kind==="space"?900:kind==="back"?1400:2200+Math.random()*1400;f.Q.value=1.2;
+  const g=a.createGain();g.gain.setValueAtTime(kind==="space"?.55:.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.07);
+  s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);
+  const o=a.createOscillator(),og=a.createGain();o.type="square";o.frequency.value=kind==="space"?140:220+Math.random()*60;
+  og.gain.setValueAtTime(.05,t);og.gain.exponentialRampToValueAtTime(.001,t+.03);o.connect(og);og.connect(a.destination);o.start(t);o.stop(t+.04)}
+function blip(freq=880,dur=.08,type="square",vol=.08){if(!soundOn)return;const a=ac(),t=a.currentTime,o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.02)}
+function arp(notes,step=.08,type="square",vol=.07){if(!soundOn)return;const a=ac(),t0=a.currentTime;
+  notes.forEach((f,i)=>{const t=t0+i*step,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+step*1.8);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+step*2)})}
+const S={
+  boot:()=>arp([262,330,392,523,659,784,1047],.07),
+  hover:()=>blip(1200,.04,"triangle",.05),
+  reveal:()=>blip(600+Math.random()*400,.06,"sine",.05),
+  error:()=>{blip(140,.18,"sawtooth",.08);setTimeout(()=>blip(110,.2,"sawtooth",.08),120)},
+  compile:()=>{let i=0;const iv=setInterval(()=>{blip(300+i*40,.03,"square",.04);if(++i>14)clearInterval(iv)},55)},
+  success:()=>arp([523,659,784,1047,784,1047,1319],.09,"square",.08),
+  type:()=>blip(1800+Math.random()*600,.015,"square",.025)};
+$("#sbtn").addEventListener("click",()=>{soundOn=!soundOn;$("#sbtn").textContent="SONIDO: "+(soundOn?"ON":"OFF");if(soundOn)blip(900)});
+
+/* ================= PARTÍCULAS ================= */
+const COLORS=["#38BDF8","#FB7185","#34D399","#FBBF24","#6366F1"];
+const fx=$("#fx"),fc=fx.getContext("2d");let P=[];
+function fsize(){fx.width=innerWidth;fx.height=innerHeight}fsize();addEventListener("resize",fsize);
+function burst(x,y,n=10,chars=false,pw=1){for(let i=0;i<n;i++){const a=Math.random()*6.28,v=(Math.random()*5+2)*pw;
+  P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-2*pw,life:1,c:COLORS[Math.random()*5|0],ch:chars?"{}<>/;=()01"[Math.random()*11|0]:null,s:Math.random()*3+2,r:Math.random()*6})}}
+(function loop(){fc.clearRect(0,0,fx.width,fx.height);
+  for(let i=P.length-1;i>=0;i--){const p=P[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.vx*=.98;p.life-=.018;p.r+=.1;
+    fc.globalAlpha=Math.max(p.life,0);fc.fillStyle=p.c;
+    if(p.ch){fc.save();fc.translate(p.x,p.y);fc.rotate(p.r);fc.font="bold 18px JetBrains Mono, monospace";fc.fillText(p.ch,0,0);fc.restore()}
+    else{fc.shadowColor=p.c;fc.shadowBlur=8;fc.fillRect(p.x,p.y,p.s,p.s);fc.shadowBlur=0}
+    if(p.life<=0)P.splice(i,1)}
+  fc.globalAlpha=1;requestAnimationFrame(loop)})();
+
+/* ================= LLUVIA DE CÓDIGO ================= */
+const rn=$("#rain"),rc=rn.getContext("2d");let cols=[];
+function rsize(){rn.width=innerWidth;rn.height=innerHeight;cols=Array.from({length:Math.ceil(innerWidth/22)},()=>Math.random()*-60)}rsize();addEventListener("resize",rsize);
+setInterval(()=>{rc.fillStyle="rgba(14,17,22,.18)";rc.fillRect(0,0,rn.width,rn.height);rc.font="15px JetBrains Mono, monospace";
+  cols.forEach((y,i)=>{rc.fillStyle=COLORS[i%5];rc.fillText("01{}<>;=/()$#"[Math.random()*13|0],i*22,y*18);cols[i]=y*18>rn.height&&Math.random()>.97?0:y+1})},60);
+
+/* ================= GLIFOS FLOTANTES ================= */
+const gl=$("#glyphs");["{ }","</>","=>","( )",";","[ ]","&&","!=","++","#"].forEach((g,i)=>{const e=document.createElement("div");e.className="glyph";e.textContent=g;
+  e.style.left=(i*10+Math.random()*6)+"%";e.style.color=COLORS[i%5];e.style.fontSize=(18+Math.random()*30)+"px";e.style.animationDuration=(14+Math.random()*14)+"s";e.style.animationDelay=(-Math.random()*20)+"s";gl.appendChild(e)});
+
+/* ================= EDITOR QUE SE ESCRIBE SOLO ================= */
+const CODE=[
+ ['cm','// bienvenido a STACK CLUB'],
+ ['k','const ','v','tu','',' = ','k','new ','f','Programador','','({'],
+ ['','  nombre: ','s','"tú"',','],
+ ['','  pasion: ','s','"código"',','],
+ ['','  nivel: ','n','9000'],
+ ['','});'],
+ [''],
+ ['k','await ','v','tu','','.','f','unirseAlClub','','();'],
+ ['v','club','','.','f','celebrar','','(','s','"+1 miembro"','',');'],
+ ['cm','// build: passing']];
+async function typeCode(){const el=$("#code");el.innerHTML="";
+  for(let li=0;li<CODE.length;li++){const line=document.createElement("div");line.innerHTML=`<span class="ln">${li+1}</span>`;el.appendChild(line);
+    const parts=CODE[li];for(let j=0;j<parts.length;j+=2){const cls=parts[j],txt=parts[j+1]||"";const sp=document.createElement("span");if(cls)sp.className=cls;line.appendChild(sp);
+      for(const ch of txt){sp.textContent+=ch;await sleep(28+Math.random()*30)}}
+    await sleep(120)}
+  await sleep(2600);typeCode()}
+
+/* ================= TEXTO ROTATIVO ================= */
+const words=["programar.","aprender.","romper cosas.","hacer deploy.","conectar."];let wi=0;
+(async function rot(){const el=$("#typed");while(true){const w=words[wi++%words.length];for(let i=1;i<=w.length;i++){el.textContent=w.slice(0,i);await sleep(70)}await sleep(1300);for(let i=w.length;i>=0;i--){el.textContent=w.slice(0,i);await sleep(35)}await sleep(250)}})();
+
+/* ================= TECLADO CON SONIDO Y CHISPAS ================= */
+const input=$("#email");
+function caretPos(){const r=input.getBoundingClientRect();const c=document.createElement("canvas").getContext("2d");c.font=getComputedStyle(input).font;
+  const w=Math.min(c.measureText(input.value).width,r.width);return {x:r.left+w+4,y:r.top+r.height/2}}
+input.addEventListener("keydown",e=>{const k=e.key;
+  if(k==="Backspace"){keyClick("back");const p=caretPos();burst(p.x,p.y,4,false,.6)}
+  else if(k===" "){keyClick("space")}
+  else if(k==="Enter"){}
+  else if(k.length===1){keyClick();const p=caretPos();burst(p.x,p.y,6,Math.random()<.5,.7);
+    if(k==="@"){arp([660,880],.06,"triangle",.07);burst(p.x,p.y,20,true,1.2)}}});
+input.addEventListener("input",()=>{const v=input.value;const out=$("#out");
+  if(!v){out.className="g";out.textContent="// escribe tu correo y escucha el teclado"}
+  else if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){out.className="ok";out.textContent="✓ correo válido. listo para hacer commit"}
+  else{out.className="y";out.textContent="> validando: "+v}});
+document.querySelectorAll(".btn,.card,.sound").forEach(b=>b.addEventListener("mouseenter",()=>S.hover()));
+
+/* ================= ENVÍO ================= */
+$("#form").addEventListener("submit",async e=>{e.preventDefault();const out=$("#out"),btn=$("#btn"),email=input.value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){S.error();out.className="p";out.textContent="ERROR: ese correo no compila. revísalo.";
+    $("#form").animate([{transform:"translateX(-10px)"},{transform:"translateX(10px)"},{transform:"none"}],{duration:220,iterations:2});return}
+  btn.disabled=true;S.compile();
+  for(const [t,c] of [["> compilando...","y"],["> conectando con el servidor...","c"],["> enviando tu pase...","m"]]){out.className=c;out.textContent=t;await sleep(380)}
+  try{if(BREVO_FORM_URL.startsWith("http"))await fetch(BREVO_FORM_URL,{method:"POST",body:new FormData(e.target),mode:"no-cors"});
+    e.target.reset();out.className="ok";out.textContent="[OK] build successful";S.success();
+    for(let i=0;i<6;i++)setTimeout(()=>burst(Math.random()*innerWidth,innerHeight*.3+Math.random()*innerHeight*.4,40,true,1.4),i*150);
+    $("#win").classList.add("show")}
+  catch(x){S.error();out.className="p";out.textContent="ERROR: algo falló. intenta otra vez."}
+  btn.disabled=false});
+function closeWin(){$("#win").classList.remove("show");blip(700)}
+
+/* ================= SCROLL ================= */
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;en.target.classList.add("show");S.reveal();
+  const n=en.target.querySelector("[data-count]");if(n){const end=+n.dataset.count,suf=n.dataset.suffix||"";let t0;
+    const st=ts=>{t0??=ts;const k=Math.min((ts-t0)/1400,1);n.textContent=Math.round(end*(1-Math.pow(1-k,4)))+suf;if(k<1){if(Math.random()<.3)S.type();requestAnimationFrame(st)}};requestAnimationFrame(st)}
+  io.unobserve(en.target)}),{threshold:.2});
+document.querySelectorAll(".reveal").forEach((el,i)=>{el.style.transitionDelay=(i%3)*.12+"s";io.observe(el)});
+document.querySelectorAll(".card").forEach(c=>{c.addEventListener("mousemove",e=>{const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  c.style.setProperty("--x",x+"px");c.style.setProperty("--y",y+"px");c.style.transform=`perspective(700px) rotateX(${(y/r.height-.5)*-12}deg) rotateY(${(x/r.width-.5)*12}deg) translateY(-6px)`});
+  c.addEventListener("mouseleave",()=>c.style.transform="")});
+addEventListener("click",e=>{if(e.target.closest("input,#sbtn"))return;burst(e.clientX,e.clientY,14,true,.9);blip(500+Math.random()*700,.05,"triangle",.05)});
+
+/* ================= ARRANQUE ================= */
+const BOOT=[["g","$ ./iniciar_stack_club.sh\n"],["c","> cargando módulos ............ "],["ok","[OK]"],["c","\n> conectando con la comunidad .. "],["ok","[OK]"],["c","\n> compilando buenas vibras ..... "],["ok","[OK]"],["m","\n\n  STACK CLUB v2026.11 listo."],["",""]];
+let started=false;
+async function bootType(){const log=$("#bootlog");log.innerHTML="";
+  for(const [c,t] of BOOT){const sp=document.createElement("span");sp.className=c;log.appendChild(sp);for(const ch of t){sp.textContent+=ch;await sleep(c==="ok"?40:18)}}
+  const pr=document.createElement("div");pr.innerHTML='<br><span class="press">&gt; presiona cualquier tecla o toca la pantalla para entrar (con sonido)</span> <span class="cur"></span>';log.appendChild(pr)}
+async function enter(){if(started)return;started=true;ac();S.boot();
+  for(let i=0;i<4;i++)setTimeout(()=>burst(innerWidth/2,innerHeight/2,30,true,1.6),i*120);
+  window.scrollTo(0,0);$("#boot").classList.add("off");document.body.classList.remove("lock");setTimeout(()=>$("#boot").remove(),700);typeCode()}
+bootType();addEventListener("keydown",e=>{if(!started){e.preventDefault();enter()}});$("#boot").addEventListener("click",enter);$("#boot").addEventListener("touchstart",enter,{passive:true});
+</script>
+</body>
+</html>
